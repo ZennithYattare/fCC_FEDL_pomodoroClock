@@ -1,11 +1,11 @@
 /** @format */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
-	const [sessionTime, setSessionTime] = useState(5);
-	const [breakTime, setBreakTime] = useState(5);
+	const [sessionTime, setSessionTime] = useState(25 * 60);
+	const [breakTime, setBreakTime] = useState(5 * 60);
 	const [timeLeft, setTimeLeft] = useState(sessionTime);
 	const [active, setActive] = useState("");
 	const [runningBool, setRunningBool] = useState(false);
@@ -30,10 +30,10 @@ function App() {
 	const changeTime = (time, type) => {
 		if (!runningBool) {
 			if (type === "session") {
-				if (time < 60) {
+				if (time <= 60) {
 					setSessionTime(60);
 					setTimeLeft(60);
-				} else if (time > 60 * 60) {
+				} else if (time >= 60 * 60) {
 					setSessionTime(60 * 60);
 					setTimeLeft(60 * 60);
 				} else {
@@ -41,9 +41,9 @@ function App() {
 					setTimeLeft(time);
 				}
 			} else if (type === "break") {
-				if (time < 60) {
+				if (time <= 60) {
 					setBreakTime(60);
-				} else if (time > 60 * 60) {
+				} else if (time >= 60 * 60) {
 					setBreakTime(60 * 60);
 				} else {
 					setBreakTime(time);
@@ -58,6 +58,52 @@ function App() {
 		audio.play();
 	};
 
+	const resetTimer = () => {
+		setSessionTime(25 * 60);
+		setBreakTime(5 * 60);
+		setTimeLeft(25 * 60);
+		clearInterval(localStorage.getItem("interval-id"));
+		setRunningBool(false);
+		setBreakBool(false);
+		const audio = document.getElementById("beep");
+		audio.pause();
+		audio.currentTime = 0;
+	};
+
+	const timer = () => {
+		setRunningBool(!runningBool);
+	};
+
+	useEffect(() => {
+		let onBreak = breakBool;
+		if (runningBool) {
+			let interval = setInterval(() => {
+				setTimeLeft((timeLeft) => {
+					if (timeLeft <= 0 && !onBreak) {
+						playAudio();
+						onBreak = true;
+						setBreakBool(true);
+						return breakTime;
+					} else if (timeLeft <= 0 && onBreak) {
+						playAudio();
+						onBreak = false;
+						setBreakBool(false);
+						return sessionTime;
+					}
+					return timeLeft - 1;
+				});
+			}, 1000);
+			localStorage.clear();
+			localStorage.setItem("interval-id", interval);
+		}
+
+		if (!runningBool) {
+			clearInterval(localStorage.getItem("interval-id"));
+		}
+
+		return () => clearInterval(localStorage.getItem("interval-id"));
+	}, [runningBool, timeLeft, breakBool]);
+
 	const buttonPressed = (index) => {
 		// increment or decrement using the index
 		if (index === "breakDecrement") {
@@ -68,47 +114,6 @@ function App() {
 			changeTime(sessionTime - 60, "session");
 		} else if (index === "sessionIncrement") {
 			changeTime(sessionTime + 60, "session");
-		}
-
-		// start and stop using the index
-		if (index === "start") {
-			console.log("START was pressed.");
-			setRunningBool(true);
-			console.log("runningBool: " + runningBool);
-			setRunningBool(true);
-			console.log("runningBool: " + runningBool);
-			// const timer = setInterval(() => {
-			// 	if (runningBool) {
-			// 		console.log("1runningBool: " + runningBool);
-			// 		if (timeLeft === 0) {
-			// 			playAudio();
-			// 			setBreakBool(!breakBool);
-			// 			if (breakBool) {
-			// 				setTimeLeft(sessionTime);
-			// 			} else {
-			// 				setTimeLeft(breakTime);
-			// 			}
-			// 		} else {
-			// 			setTimeLeft((timeLeft) => timeLeft - 1);
-			// 			console.log(timeLeft);
-			// 		}
-			// 	} else {
-			// 		clearInterval(timer);
-			// 	}
-			// }, 1000);
-		} else if (index === "stop") {
-			console.log("STOP was pressed.");
-			setRunningBool(false);
-		}
-
-		if (index === "reset") {
-			setSessionTime(25 * 60);
-			setBreakTime(5 * 60);
-			setTimeLeft(25 * 60);
-			setRunningBool(false);
-			const audio = document.getElementById("beep");
-			audio.pause();
-			audio.currentTime = 0;
 		}
 
 		// using setActive to change the border color of the button
@@ -227,11 +232,7 @@ function App() {
 									: "border-2 border-t-slate-200 border-l-slate-200 border-r-[#cccccc] border-b-[#cccccc]"
 							}`}
 							onClick={() => {
-								{
-									runningBool
-										? buttonPressed("stop")
-										: buttonPressed("start");
-								}
+								timer();
 							}}
 						>
 							{runningBool ? "Stop" : "Start"}
@@ -244,7 +245,7 @@ function App() {
 									: "border-2 border-t-slate-200 border-l-slate-200 border-r-[#cccccc] border-b-[#cccccc]"
 							}`}
 							onClick={() => {
-								buttonPressed("reset");
+								resetTimer();
 							}}
 						>
 							Reset
