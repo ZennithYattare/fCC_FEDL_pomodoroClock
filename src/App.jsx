@@ -129,9 +129,17 @@ function App() {
 				id="beep"
 				src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
 			></audio>
-			<div className="flex h-screen w-screen place-items-center bg-[#923737]">
+			<div
+				className={`flex h-screen w-screen place-items-center transition duration-700 ease-in-out ${
+					breakBool ? "bg-[#2D6A6E]" : "bg-[#923737]"
+				}`}
+			>
 				<div className="mx-1 w-[560px] min-w-[420px] max-w-xl border-4 border-t-slate-200 border-l-slate-200 border-r-[#cccccc] border-b-[#cccccc] bg-[#dcd5d5] shadow-[5px_5px_5px_black] sm:mx-auto">
-					<div className="bg-gradient-to-r from-[#923737] to-[#cccccc] p-1 font-mono text-lg font-bold text-gray-50">
+					<div
+						className={`p-1 font-mono text-lg font-bold text-gray-50 transition duration-700 ease-in-out ${
+							breakBool ? "bg-[#38858A]" : "bg-[#BA4949]"
+						}`}
+					>
 						freeCodeCamp: 25 + 5 Clock
 					</div>
 					<div className="mx-auto grid w-auto select-none grid-cols-2 text-center font-mono text-2xl sm:text-3xl">
@@ -145,7 +153,7 @@ function App() {
 						<div className="">
 							<span
 								id="break-decrement"
-								className={`px-2 shadow-[2px_2px_2px_black] hover:cursor-pointer hover:bg-zinc-400 ${
+								className={`px-2 shadow-[2px_2px_2px_black] transition-colors hover:cursor-pointer hover:bg-zinc-400 ${
 									active === "breakDecrement"
 										? "border-2 border-zinc-700"
 										: "border-2 border-t-slate-200 border-l-slate-200 border-r-[#cccccc] border-b-[#cccccc]"
@@ -164,7 +172,7 @@ function App() {
 							</div>
 							<span
 								id="break-increment"
-								className={`px-2 shadow-[2px_2px_2px_black] hover:cursor-pointer hover:bg-zinc-400 ${
+								className={`px-2 shadow-[2px_2px_2px_black] transition-colors hover:cursor-pointer hover:bg-zinc-400 ${
 									active === "breakIncrement"
 										? "border-2 border-zinc-700"
 										: "border-2 border-t-slate-200 border-l-slate-200 border-r-[#cccccc] border-b-[#cccccc]"
@@ -180,7 +188,7 @@ function App() {
 						<div className="">
 							<span
 								id="session-decrement"
-								className={`px-2 shadow-[2px_2px_2px_black] hover:cursor-pointer hover:bg-zinc-400 ${
+								className={`px-2 shadow-[2px_2px_2px_black] transition-colors hover:cursor-pointer hover:bg-zinc-400 ${
 									active === "sessionDecrement"
 										? "border-2 border-zinc-700"
 										: "border-2 border-t-slate-200 border-l-slate-200 border-r-[#cccccc] border-b-[#cccccc]"
@@ -199,7 +207,7 @@ function App() {
 							</div>
 							<span
 								id="session-increment"
-								className={`px-2 shadow-[2px_2px_2px_black] hover:cursor-pointer hover:bg-zinc-400 ${
+								className={`px-2 shadow-[2px_2px_2px_black] transition-colors hover:cursor-pointer hover:bg-zinc-400 ${
 									active === "sessionIncrement"
 										? "border-2 border-zinc-700"
 										: "border-2 border-t-slate-200 border-l-slate-200 border-r-[#cccccc] border-b-[#cccccc]"
@@ -226,13 +234,14 @@ function App() {
 
 						<div
 							id="start_stop"
-							className={`mx-auto mb-4 inline-block w-52 py-1 shadow-[2px_2px_2px_black] hover:cursor-pointer hover:bg-zinc-400 ${
+							className={`mx-auto mb-4 inline-block w-52 py-1 shadow-[2px_2px_2px_black] transition-colors hover:cursor-pointer hover:bg-zinc-400 ${
 								active === "startStop"
 									? "border-2 border-zinc-700"
 									: "border-2 border-t-slate-200 border-l-slate-200 border-r-[#cccccc] border-b-[#cccccc]"
 							}`}
 							onClick={() => {
 								timer();
+								buttonPressed("startStop");
 							}}
 						>
 							{runningBool ? "Stop" : "Start"}
@@ -246,6 +255,7 @@ function App() {
 							}`}
 							onClick={() => {
 								resetTimer();
+								buttonPressed("reset");
 							}}
 						>
 							Reset
